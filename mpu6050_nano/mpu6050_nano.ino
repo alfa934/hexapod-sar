@@ -8,6 +8,10 @@
  * 
  */
 
+#include <Pixy2I2C.h>
+Pixy2I2C pixy;
+
+
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 
@@ -121,6 +125,8 @@ void setup() {
             calibrationProcess(); 
         }
     }
+
+    pixy.init();
 }
 
 // ================================================================
@@ -195,21 +201,46 @@ void calibrationProcess()
 }
 
 void mainProcess()
-{   
+{
+    int i; 
+    pixy.ccc.getBlocks();
+
+    // If there are detect blocks, print them!
+    if (pixy.ccc.numBlocks)
+    {
+        Serial.print("Detected ");
+        Serial.println(pixy.ccc.numBlocks);
+        for (i=0; i<pixy.ccc.numBlocks; i++)
+        {
+            Serial.print("  block ");
+            Serial.print(i);
+            Serial.print(": ");
+            pixy.ccc.blocks[i].print();
+        }
+    }
+
+    
     yaw_data = -(ypr[0] - offset_degree) * 180/M_PI;
     
     if(yaw_data > 180)       yaw_data -= 360;
     else if(yaw_data < -180) yaw_data += 360;
 
-    pitch_data = ypr[1];
+    pitch_data = ypr[1] * 180/M_PI;
 
-    roll_data = ypr[2];
+    roll_data = ypr[2] * 180/M_PI;
+
+    Serial.print("YPR: ");
+    Serial.print(yaw_data);
+    Serial.print(" ; ");
+    Serial.print(pitch_data);
+    Serial.print(" ; ");
+    Serial.println(roll_data);
 
     memcpy(send_ypr_data + 3, &yaw_data, 4);
     memcpy(send_ypr_data + 7, &pitch_data, 4);
     memcpy(send_ypr_data + 11, &roll_data, 4); 
 
-    for(int i = 0; i < sizeof(send_ypr_data); i++)
-        Serial.write(send_ypr_data[i]);
+//    for(int i = 0; i < sizeof(send_ypr_data); i++)
+//        Serial.write(send_ypr_data[i]);
 
 }
