@@ -7,7 +7,7 @@ Sensor dan Aktuator yg dipakai
 - 2 emax servo -  pwm
 - 5 ir sensor  - analog
 - MPU6050 (IMU) - i2c
-- Pixy2 Camera - uart
+- Pixy2 Camera - uart (res = 316x208 -> middle = 158x104)
 
 Microcontroller 
 
